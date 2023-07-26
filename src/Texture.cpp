@@ -259,9 +259,9 @@ void TextureCubeMap::setupFace(int face, unsigned char* data, GLenum format,
 #endif
 }
 
-std::shared_ptr<TextureCubeMap> createTextureCubeMapFromFiles(
+std::unique_ptr<TextureCubeMap> createTextureCubeMapFromFiles(
     const std::vector<std::string>& filenames, unsigned int options) {
-    shared_ptr<TextureCubeMap> tex = make_shared<TextureCubeMap>();
+    unique_ptr<TextureCubeMap> tex = make_unique<TextureCubeMap>();
     tex->init();
     bool generateMipmap = options & TEXTURE_OPTION_MIPMAP,
          convertToLinear = options & TEXTURE_OPTION_CONVERT_TO_LINEAR;

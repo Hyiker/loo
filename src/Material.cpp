@@ -31,9 +31,14 @@ static shared_ptr<Texture2D> createMaterialTextures(
     if (mat->GetTextureCount(type)) {
         // TODO: support multilayer texture
         aiString str;
-        mat->GetTexture(type, 0, &str);
-        return createTexture2DFromFile(
+        aiTextureMapMode mapMode;
+        mat->GetTexture(type, 0, &str, nullptr, nullptr, nullptr, nullptr,
+                        &mapMode);
+        auto texture = createTexture2DFromFile(
             uniqueTexture, (objParent / str.C_Str()).string(), options);
+        texture->setWrapFilter(
+            mapMode == aiTextureMapMode_Wrap ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+        return texture;
     } else {
         return nullptr;
     }
