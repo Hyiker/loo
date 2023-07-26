@@ -26,7 +26,7 @@ using namespace std;
 Application* Application::context = nullptr;
 
 Application::Application(int width, int height, const std::string& title)
-    : state(stateReady), width(width), height(height), title(title) {
+    : width(width), height(height), title(title) {
     initGLFW();
     // glad load
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -42,7 +42,7 @@ GLFWwindow* Application::getWindow() const {
 }
 
 void Application::exit() {
-    state = stateExit;
+    glfwSetWindowShouldClose(window, true);
 }
 
 float Application::getFrameDeltaTime() const {
@@ -54,16 +54,15 @@ float Application::getTime() const {
 }
 
 void Application::run() {
-    state = stateRun;
 
     // Make the window's context current
     glfwMakeContextCurrent(window);
     // uncomment to disable vsync
-    glfwSwapInterval(false);
+    glfwSwapInterval(1);
 
     time = glfwGetTime();
 
-    while (state == stateRun && !glfwWindowShouldClose(window) &&
+    while (!glfwWindowShouldClose(window) &&
            !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         // set glfwPointer to current window just to make sure callback get the
         // right context

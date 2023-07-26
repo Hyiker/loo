@@ -74,10 +74,6 @@ class LOO_EXPORT Application {
     void restoreViewport();
 
    private:
-    enum State { stateReady, stateRun, stateExit };
-
-    State state;
-
     GLFWwindow* window;
     static Application* context;
     static Quad* globalQuad;

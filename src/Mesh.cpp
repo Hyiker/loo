@@ -12,7 +12,7 @@
 #include <vector>
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include "glm/ext.hpp"
+#include <glm/ext.hpp>
 namespace loo {
 using namespace std;
 using namespace glm;
@@ -75,22 +75,6 @@ size_t Mesh::countVertex() const {
 size_t Mesh::countTriangles(bool lod) const {
     return indices.size() / 3;
 }
-
-void Mesh::draw(ShaderProgram& sp, GLenum drawMode, bool tessellation) const {
-    glPolygonMode(GL_FRONT_AND_BACK, drawMode);
-    glBindVertexArray(vao);
-    // bind material uniforms
-    material->bind(sp);
-    sp.setUniform("meshLod", false);
-    logPossibleGLError();
-    glDrawElements(tessellation ? GL_PATCHES : GL_TRIANGLES,
-                   static_cast<GLuint>(indices.size()), GL_UNSIGNED_INT,
-                   (void*)(0));
-
-    glBindVertexArray(0);
-}
-
-void Mesh::updateLod(float screenProportion) {}
 
 using namespace Assimp;
 
@@ -217,8 +201,7 @@ static void processAssimpNode(aiNode* node, const aiScene* scene,
     }
 }
 
-vector<shared_ptr<Mesh>> createMeshFromFile(const string& filename,
-                                            const glm::mat4& sceneTransform) {
+vector<shared_ptr<Mesh>> createMeshFromFile(const string& filename) {
     Importer importer;
     vector<shared_ptr<Mesh>> meshes;
     fs::path filePath(filename);
@@ -233,7 +216,7 @@ vector<shared_ptr<Mesh>> createMeshFromFile(const string& filename,
         return {};
     }
     processAssimpNode(scene->mRootNode, scene, meshes, fileParent,
-                      sceneTransform);
+                      glm::identity<glm::mat4>());
     return std::move(meshes);
 }
 

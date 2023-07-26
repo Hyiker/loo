@@ -23,6 +23,8 @@ namespace loo {
 using namespace std;
 using namespace glm;
 
+map<GLint, std::unique_ptr<UniformBuffer>> ShaderProgram::portMap;
+
 // file reading
 void getFileContents(const char* filename, vector<char>& buffer) {
     ifstream file(filename, ios_base::binary);

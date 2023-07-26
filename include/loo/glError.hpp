@@ -17,16 +17,16 @@
 
 namespace loo {
 
-#define logPossibleGLError()                                          \
-    if (auto e = glGetError(); e != GL_NO_ERROR) {                    \
-        LOG(ERROR) << "Error code " << e << ": " << errCode2String(e) \
-                   << std::endl;                                      \
+#define logPossibleGLError()                                               \
+    if (auto e = glGetError(); e != GL_NO_ERROR) {                         \
+        LOG(ERROR) << "Error code " << e << ": " << loo::errCode2String(e) \
+                   << std::endl;                                           \
     }
 // throw a fatal when met possible opengl error
-#define panicPossibleGLError()                                        \
-    if (auto e = glGetError(); e != GL_NO_ERROR) {                    \
-        LOG(FATAL) << "Error code " << e << ": " << errCode2String(e) \
-                   << "; Exit now!" << std::endl;                     \
+#define panicPossibleGLError()                                             \
+    if (auto e = glGetError(); e != GL_NO_ERROR) {                         \
+        LOG(FATAL) << "Error code " << e << ": " << loo::errCode2String(e) \
+                   << "; Exit now!" << std::endl;                          \
     }
 #define NOT_IMPLEMENTED_RUNTIME() \
     LOG(FATAL) << "Function " << __func__ << "() hasn't been implemented yet!\n"

@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <glm/gtc/matrix_transform.hpp>
 #include <loo/glError.hpp>
+#include "glm/ext/matrix_transform.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -66,33 +67,9 @@ void Scene::prepare() const {
         mesh->prepare();
     }
 }
-
-void Scene::draw(ShaderProgram& sp,
-                 std::function<void(const Scene&, const Mesh&)> beforeDraw,
-                 GLenum drawMode, int drawFlags) const {
-    GLint dims[4] = {0};
-    glGetIntegerv(GL_VIEWPORT, dims);
-    GLint fbSize = dims[2] * dims[3];
-    static int counter = 0;
-    for (const auto& mesh : m_meshes) {
-        glBeginQuery(GL_SAMPLES_PASSED, m_queryid);
-        beforeDraw(*this, *mesh);
-        mesh->draw(sp, drawMode, drawFlags & DRAW_FLAG_TESSELLATION);
-        glEndQuery(GL_SAMPLES_PASSED);
-    }
-}
-void Scene::draw(ShaderProgram& sp, GLenum drawMode, int drawFlags) const {
-    draw(
-        sp, [](const Scene&, const Mesh&) {}, drawMode, drawFlags);
-}
-
 Scene::Scene() {
-    glGenQueries(1, &m_queryid);
+    m_modelmat = glm::scale(glm::identity<mat4>(), vec3(0.01));
 }
-Scene::~Scene() {
-    glDeleteQueries(1, &m_queryid);
-}
-
 Scene createSceneFromFile(const std::string& filename) {
     NOT_IMPLEMENTED_RUNTIME();
     Scene scene;

@@ -5,8 +5,8 @@
  * Licence:
  *      * MIT
  */
-#ifndef LOO_LOO_SHADER_HPP
-#define LOO_LOO_SHADER_HPP
+#ifndef LOO_INCLUDE_LOO_SHADER_HPP
+#define LOO_INCLUDE_LOO_SHADER_HPP
 
 #include <exception>
 #include <vector>
@@ -18,10 +18,12 @@
 #include <map>
 #include <string>
 
+#include <loo/UniformBuffer.hpp>
 #include "Texture.hpp"
 #include "predefs.hpp"
 
 namespace loo {
+class UniformBuffer;
 
 enum class ShaderType {
     Vertex = GL_VERTEX_SHADER,
@@ -126,6 +128,21 @@ class LOO_EXPORT ShaderProgram {
         glBindTextureUnit(unit, tex.getId());
     }
 
+    static void initUniformBlock(std::unique_ptr<UniformBuffer> ub) {
+        int port = ub->getBindPoint();
+        if (portMap.find(port) != portMap.end())
+            LOG(WARNING) << "Uniform block port " << port << " already exists.";
+        portMap[port] = std::move(ub);
+    }
+
+    static UniformBuffer& getUniformBlock(int port) {
+        auto it = portMap.find(port);
+        if (it == portMap.end()) {
+            LOG(FATAL) << "Uniform block port " << port << " not found.";
+        }
+        return *portMap[port];
+    }
+
     ~ShaderProgram();
 
    private:
@@ -134,6 +151,7 @@ class LOO_EXPORT ShaderProgram {
     std::map<std::string, GLint> uniforms;
     std::map<std::string, GLint> attributes;
 
+    static std::map<GLint, std::unique_ptr<UniformBuffer>> portMap;
     // opengl id
     GLuint handle;
 
@@ -146,4 +164,4 @@ class LOO_EXPORT ShaderCompileException : public std::exception {
 };
 }  // namespace loo
 
-#endif /* LOO_LOO_SHADER_HPP */
+#endif /* LOO_INCLUDE_LOO_SHADER_HPP */

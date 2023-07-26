@@ -6,9 +6,6 @@
 
 #include "Material.hpp"
 #include "Shader.hpp"
-#include "Texture.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "loo.hpp"
 #include "predefs.hpp"
 
 namespace loo {
@@ -45,17 +42,11 @@ struct LOO_EXPORT Mesh {
     size_t countVertex() const;
     size_t countTriangles(bool lod = true) const;
 
-    void draw(ShaderProgram& sp, GLenum drawMode = GL_FILL,
-              bool tessellation = false) const;
-    void updateLod(float screenProportion);
     int getLod() const { return 0; }
-
-   private:
 };
 
 LOO_EXPORT std::vector<std::shared_ptr<Mesh>> createMeshFromFile(
-    const std::string& filename,
-    const glm::mat4& sceneTransform = glm::identity<glm::mat4>());
+    const std::string& filename);
 
 }  // namespace loo
 
