@@ -33,6 +33,15 @@ class LOO_EXPORT Renderbuffer {
         unbind();
 #endif
     }
+    void set(GLenum internalformat, GLsizei width, GLsizei height) {
+#ifdef OGL_46
+        glNamedRenderbufferStorage(m_rbo, internalformat, width, height);
+#else
+        bind();
+        glRenderbufferStorage(GL_RENDERBUFFER, internalformat, width, height);
+        unbind();
+#endif
+    }
     GLuint getId() const { return m_rbo; }
     ~Renderbuffer() { glDeleteRenderbuffers(1, &m_rbo); }
 };
