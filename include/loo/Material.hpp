@@ -1,5 +1,5 @@
-#ifndef LOO_LOO_MATERIAL_HPP
-#define LOO_LOO_MATERIAL_HPP
+#ifndef LOO_INCLUDE_LOO_MATERIAL_HPP
+#define LOO_INCLUDE_LOO_MATERIAL_HPP
 #include "Shader.hpp"
 
 #include <assimp/material.h>
@@ -18,6 +18,7 @@ class LOO_EXPORT Material {
    public:
     // setup uniforms and textures for shader program
     virtual void bind(const ShaderProgram& sp) = 0;
+    [[nodiscard]] virtual bool isTransparent() const { return false; }
 };
 
 struct BlinnPhongWorkFlow {
@@ -39,26 +40,13 @@ struct BlinnPhongWorkFlow {
           shininess(sh) {}
 };
 struct MetallicRoughnessWorkFlow {
-    glm::vec3 baseColor;
+    glm::vec4 baseColor;
     float metallic;
     float roughness;
 
-    // transmission factor
-    float transmission;
-    // sigma_t = 1 / mfp
-    glm::vec3 sigma_t;
-    // sigma_a
-    glm::vec3 sigma_a;
-
     MetallicRoughnessWorkFlow() = default;
-    MetallicRoughnessWorkFlow(glm::vec3 bc, float m, float r, float t,
-                              glm::vec3 st, glm::vec3 sa)
-        : baseColor(bc),
-          metallic(m),
-          roughness(r),
-          transmission(t),
-          sigma_t(st),
-          sigma_a(sa) {}
+    MetallicRoughnessWorkFlow(glm::vec4 bc, float m, float r)
+        : baseColor(bc), metallic(m), roughness(r) {}
 
     std::shared_ptr<loo::Texture2D> baseColorTex{};
     std::shared_ptr<loo::Texture2D> occlusionTex{};
@@ -87,4 +75,4 @@ struct BaseMaterial : public Material {
 std::shared_ptr<loo::BaseMaterial> createBaseMaterialFromAssimp(
     const aiMaterial* aMaterial, std::filesystem::path objParent);
 }  // namespace loo
-#endif /* LOO_LOO_MATERIAL_HPP */
+#endif /* LOO_INCLUDE_LOO_MATERIAL_HPP */

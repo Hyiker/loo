@@ -22,6 +22,9 @@ static unordered_map<string, shared_ptr<Texture2D>> uniqueTexture;
 static inline glm::vec3 aiColor3D2Glm(const aiColor3D& aColor) {
     return {aColor.r, aColor.g, aColor.b};
 }
+static inline glm::vec4 aiColor4D2Glm(const aiColor4D& aColor) {
+    return {aColor.r, aColor.g, aColor.b, aColor.a};
+}
 
 static shared_ptr<Texture2D> createMaterialTextures(
     const aiMaterial* mat, aiTextureType type, fs::path objParent,
@@ -67,19 +70,13 @@ static BlinnPhongWorkFlow createBlinnPhongWorkFlowFromAssimp(
 
 static MetallicRoughnessWorkFlow createMetallicRoughnessWorkFlowFromAssimp(
     const aiMaterial* aMaterial, fs::path objParent) {
-    aiColor3D color(0, 0, 0);
-    aMaterial->Get(AI_MATKEY_BASE_COLOR, color);
-    glm::vec3 baseColor = aiColor3D2Glm(color);
+    aiColor4D color4(0, 0, 0, 0);
+    aMaterial->Get(AI_MATKEY_BASE_COLOR, color4);
+    glm::vec4 baseColor = aiColor4D2Glm(color4);
 
     float metallic, roughness;
     aMaterial->Get(AI_MATKEY_METALLIC_FACTOR, metallic);
     aMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness);
-
-    float transmission = 0.0, mfp = 0.0;
-    aMaterial->Get(AI_MATKEY_TRANSMISSION_FACTOR, transmission);
-    aMaterial->Get(AI_MATKEY_VOLUME_ATTENUATION_COLOR, color);
-    glm::vec3 sigma_a = aiColor3D2Glm(color);
-    aMaterial->Get(AI_MATKEY_VOLUME_ATTENUATION_DISTANCE, mfp);
 
     auto baseColorTex =
         createMaterialTextures(aMaterial, aiTextureType_BASE_COLOR, objParent);
@@ -90,9 +87,7 @@ static MetallicRoughnessWorkFlow createMetallicRoughnessWorkFlowFromAssimp(
     auto roughnessTex = createMaterialTextures(
         aMaterial, aiTextureType_DIFFUSE_ROUGHNESS, objParent);
 
-    auto workflow =
-        MetallicRoughnessWorkFlow(baseColor, metallic, roughness, transmission,
-                                  glm::vec3(1 / mfp), sigma_a);
+    auto workflow = MetallicRoughnessWorkFlow(baseColor, metallic, roughness);
     workflow.baseColorTex = baseColorTex;
     workflow.occlusionTex = occlusionTex;
     workflow.metallicTex = metallicTex;

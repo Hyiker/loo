@@ -40,6 +40,10 @@ struct LOO_EXPORT Mesh {
           objectMatrix(transform),
           aabb(aabb) {}
 
+    bool isTransparent() const {
+        return material ? material->isTransparent() : false;
+    }
+
     GLuint vao, vbo, ebo;
     void prepare();
     size_t countVertex() const;
