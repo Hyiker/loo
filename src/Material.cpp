@@ -78,14 +78,18 @@ static MetallicRoughnessWorkFlow createMetallicRoughnessWorkFlowFromAssimp(
     aMaterial->Get(AI_MATKEY_METALLIC_FACTOR, metallic);
     aMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness);
 
-    auto baseColorTex =
-        createMaterialTextures(aMaterial, aiTextureType_BASE_COLOR, objParent);
-    auto occlusionTex = createMaterialTextures(
-        aMaterial, aiTextureType_AMBIENT_OCCLUSION, objParent);
-    auto metallicTex =
-        createMaterialTextures(aMaterial, aiTextureType_METALNESS, objParent);
-    auto roughnessTex = createMaterialTextures(
-        aMaterial, aiTextureType_DIFFUSE_ROUGHNESS, objParent);
+    //  baseColor textures are sRGB
+    auto baseColorTex = createMaterialTextures(
+        aMaterial, aiTextureType_BASE_COLOR, objParent,
+        TEXTURE_OPTION_MIPMAP | TEXTURE_OPTION_CONVERT_TO_LINEAR);
+    auto occlusionTex =
+        createMaterialTextures(aMaterial, aiTextureType_AMBIENT_OCCLUSION,
+                               objParent, TEXTURE_OPTION_MIPMAP);
+    auto metallicTex = createMaterialTextures(
+        aMaterial, aiTextureType_METALNESS, objParent, TEXTURE_OPTION_MIPMAP);
+    auto roughnessTex =
+        createMaterialTextures(aMaterial, aiTextureType_DIFFUSE_ROUGHNESS,
+                               objParent, TEXTURE_OPTION_MIPMAP);
 
     auto workflow = MetallicRoughnessWorkFlow(baseColor, metallic, roughness);
     workflow.baseColorTex = baseColorTex;
