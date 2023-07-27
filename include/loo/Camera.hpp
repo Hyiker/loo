@@ -63,8 +63,9 @@ class LOO_EXPORT Camera {
 
     void processKeyboard(CameraMovement direction, float deltaTime);
 
-    void processMouseMovement(float xoffset, float yoffset,
-                              GLboolean constrainpitch = true);
+    void rotateCamera(float xoffset, float yoffset,
+                      GLboolean constrainpitch = true);
+    void stareRotate(float xoffset, float yoffset);
 
     void processMouseScroll(float xoffset, float yoffset);
 

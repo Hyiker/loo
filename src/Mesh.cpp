@@ -72,7 +72,7 @@ void Mesh::prepare() {
 size_t Mesh::countVertex() const {
     return vertices.size();
 }
-size_t Mesh::countTriangles(bool lod) const {
+size_t Mesh::countTriangles() const {
     return indices.size() / 3;
 }
 
@@ -178,10 +178,13 @@ static std::shared_ptr<Mesh> processAssimpMesh(
     // specular: texture_specularN
     // normal: texture_normalN
     auto mat = createBaseMaterialFromAssimp(material, objParent);
-
+    auto assimpAABB = mesh->mAABB;
+    AABB aabb(
+        glm::vec3(assimpAABB.mMin.x, assimpAABB.mMin.y, assimpAABB.mMin.z),
+        glm::vec3(assimpAABB.mMax.x, assimpAABB.mMax.y, assimpAABB.mMax.z));
     // return a mesh object created from the extracted mesh data
     return make_shared<Mesh>(std::move(vertices), std::move(indices), mat,
-                             mesh->mName.C_Str(), parentTransform);
+                             mesh->mName.C_Str(), parentTransform, aabb);
 }
 
 static void processAssimpNode(aiNode* node, const aiScene* scene,
@@ -192,6 +195,7 @@ static void processAssimpNode(aiNode* node, const aiScene* scene,
     nodeTransform = parentTransform * nodeTransform;
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
         meshes.push_back(
             processAssimpMesh(mesh, scene, objParent, nodeTransform));
     }
@@ -201,7 +205,8 @@ static void processAssimpNode(aiNode* node, const aiScene* scene,
     }
 }
 
-vector<shared_ptr<Mesh>> createMeshFromFile(const string& filename) {
+vector<shared_ptr<Mesh>> createMeshFromFile(const string& filename,
+                                            string& modelName) {
     Importer importer;
     vector<shared_ptr<Mesh>> meshes;
     fs::path filePath(filename);
@@ -209,7 +214,7 @@ vector<shared_ptr<Mesh>> createMeshFromFile(const string& filename) {
     const auto scene = importer.ReadFile(
         filename, aiProcess_Triangulate | aiProcess_FlipUVs |
                       aiProcess_GenNormals | aiProcess_GenNormals |
-                      aiProcess_CalcTangentSpace);
+                      aiProcess_CalcTangentSpace | aiProcess_GenBoundingBoxes);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
         !scene->mRootNode) {
         LOG(ERROR) << "Assimp: " << importer.GetErrorString() << endl;
@@ -217,6 +222,7 @@ vector<shared_ptr<Mesh>> createMeshFromFile(const string& filename) {
     }
     processAssimpNode(scene->mRootNode, scene, meshes, fileParent,
                       glm::identity<glm::mat4>());
+    modelName = scene->mName.C_Str();
     return std::move(meshes);
 }
 

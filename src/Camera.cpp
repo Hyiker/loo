@@ -34,18 +34,24 @@ void Camera::getProjectionMatrix(glm::mat4& projection) const {
     projection = glm::perspective(m_fov, m_aspect, m_znear, m_zfar);
 }
 
-glm::vec3 Camera::getPosition() const { return position; }
+glm::vec3 Camera::getPosition() const {
+    return position;
+}
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
     float velocity = speed * deltaTime;
-    if (direction == CameraMovement::FORWARD) position += front * velocity;
-    if (direction == CameraMovement::BACKWARD) position -= front * velocity;
-    if (direction == CameraMovement::LEFT) position -= right * velocity;
-    if (direction == CameraMovement::RIGHT) position += right * velocity;
+    if (direction == CameraMovement::FORWARD)
+        position += front * velocity;
+    if (direction == CameraMovement::BACKWARD)
+        position -= front * velocity;
+    if (direction == CameraMovement::LEFT)
+        position -= right * velocity;
+    if (direction == CameraMovement::RIGHT)
+        position += right * velocity;
 }
 
-void Camera::processMouseMovement(float xoffset, float yoffset,
-                                  GLboolean constrainpitch) {
+void Camera::rotateCamera(float xoffset, float yoffset,
+                          GLboolean constrainpitch) {
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
@@ -55,11 +61,26 @@ void Camera::processMouseMovement(float xoffset, float yoffset,
     pitch += yoffset;
 
     if (constrainpitch) {
-        if (pitch > 89.0f) pitch = 89.0f;
-        if (pitch < -89.0f) pitch = -89.0f;
+        if (pitch > 89.0f)
+            pitch = 89.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
     }
 
     updateCameraVectors();
+}
+
+void Camera::stareRotate(float xoffset, float yoffset) {
+    glm::vec3 camFocus = position - lookat;
+    glm::mat4 rot =
+        glm::rotate(glm::mat4(1.f), -xoffset * sensitivity * 1e-2f, up) *
+        glm::rotate(glm::mat4(1.f), yoffset * sensitivity * 1e-2f, right);
+    camFocus = glm::vec3(rot * glm::vec4(camFocus, 1.f));
+    position = lookat + camFocus;
+    front = glm::normalize(-camFocus);
+    right = glm::cross(front, worldUp);
+    up = glm::cross(right, front);
+    updatePitchAndYaw();
 }
 void Camera::processMouseScroll(float xoffset, float yoffset) {
     m_fov -= yoffset * 0.05;

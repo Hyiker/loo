@@ -20,7 +20,7 @@ static unsigned char* readImageFromFile(const std::string& filename, int* width,
     unsigned char* data = stbi_load(filename.c_str(), width, height, &ncomp, 0);
     if (!data) {
         LOG(ERROR) << "Parse " << filename
-                   << "failed: " << stbi_failure_reason();
+                   << " failed: " << stbi_failure_reason();
         return nullptr;
     }
     // TODO: a more elegant way to read srgb texture

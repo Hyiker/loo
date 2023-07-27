@@ -59,6 +59,13 @@ size_t Scene::countTriangle() const {
 
 void Scene::addMeshes(vector<shared_ptr<Mesh>>&& meshes) {
     m_meshes.insert(m_meshes.end(), meshes.begin(), meshes.end());
+    for (const auto& mesh : meshes) {
+        aabb.merge(mesh->aabb.transform(mesh->objectMatrix));
+    }
+}
+
+AABB Scene::computeAABBWorldSpace() {
+    return aabb.transform(m_modelmat);
 }
 
 // prepare the scene, move the mesh data into opengl side
