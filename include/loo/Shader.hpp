@@ -30,7 +30,8 @@ enum class ShaderType {
     Fragment = GL_FRAGMENT_SHADER,
     TessellationControl = GL_TESS_CONTROL_SHADER,
     TessellationEvaluation = GL_TESS_EVALUATION_SHADER,
-    Geometry = GL_GEOMETRY_SHADER
+    Geometry = GL_GEOMETRY_SHADER,
+    Compute = GL_COMPUTE_SHADER
 };
 
 // Loads a shader from a file into OpenGL.
@@ -143,9 +144,9 @@ class LOO_EXPORT ShaderProgram {
         return *portMap[port];
     }
 
-    ~ShaderProgram();
+    virtual ~ShaderProgram();
 
-   private:
+   protected:
     ShaderProgram();
 
     std::map<std::string, GLint> uniforms;
