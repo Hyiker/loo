@@ -28,7 +28,7 @@ template <GLenum Target>
 class LOO_EXPORT Texture {
    protected:
     GLuint m_id{GL_INVALID_INDEX};
-    GLsizei width{-1}, height{-1};
+    GLsizei width{0}, height{0};
 
    public:
     GLsizei getWidth() { return width; }
