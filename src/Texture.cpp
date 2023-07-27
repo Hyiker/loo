@@ -77,9 +77,10 @@ std::shared_ptr<Texture2D> createTexture2DFromFile(
     tex->setup(data, width, height, internalFmt, imgfmt, GL_UNSIGNED_BYTE,
                generateMipmap ? -1 : 1);
     panicPossibleGLError();
-    if (generateMipmap)
+    if (generateMipmap) {
         tex->setSizeFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    else
+        tex->setAnisotropy(Texture2D::maxAnisotropy());
+    } else
         tex->setSizeFilter(GL_LINEAR, GL_LINEAR);
     panicPossibleGLError();
     tex->setWrapFilter(GL_REPEAT);

@@ -102,6 +102,21 @@ class LOO_EXPORT Texture {
         unbind();
 #endif
     }
+    static float maxAnisotropy() {
+        float maxAnisotropy = 0.0f;
+
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAnisotropy);
+        return maxAnisotropy;
+    }
+    void setAnisotropy(GLfloat level) {
+#ifdef OGL_46
+        glTextureParameterf(m_id, GL_TEXTURE_MAX_ANISOTROPY, level);
+#else
+        bind();
+        glTexParameterf(Target, GL_TEXTURE_MAX_ANISOTROPY, level);
+        unbind();
+#endif
+    }
 };
 constexpr unsigned int TEXTURE_OPTION_MIPMAP = 0x1,
                        TEXTURE_OPTION_CONVERT_TO_LINEAR = 0x2;
