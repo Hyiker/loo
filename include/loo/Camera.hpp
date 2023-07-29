@@ -35,8 +35,9 @@ class LOO_EXPORT Camera {
     }
     glm::mat4 getViewMatrix() const;
     void getViewMatrix(glm::mat4& view) const;
-    virtual glm::mat4 getProjectionMatrix() const = 0;
-    virtual void getProjectionMatrix(glm::mat4& projection) const = 0;
+    virtual glm::mat4 getProjectionMatrix(bool reverseZ01 = false) const = 0;
+    virtual void getProjectionMatrix(glm::mat4& projection,
+                                     bool reverseZ01 = false) const = 0;
 
     void moveCamera(CameraMovement direction, float deltaTime);
     virtual void zoomCamera(float value) = 0;
@@ -78,8 +79,9 @@ class LOO_EXPORT PerspectiveCamera : public Camera {
           m_fov(glm::radians(fovDeg)),
           m_aspect(aspect) {}
 
-    void getProjectionMatrix(glm::mat4& projection) const override;
-    glm::mat4 getProjectionMatrix() const override;
+    void getProjectionMatrix(glm::mat4& projection,
+                             bool reverseZ01 = false) const override;
+    glm::mat4 getProjectionMatrix(bool reverseZ01 = false) const override;
     void zoomCamera(float value) override;
     void setAspect(float aspect) { m_aspect = aspect; }
     void setAspect(int width, int height) { m_aspect = float(width) / height; }
