@@ -3,43 +3,31 @@
 #include <algorithm>
 #include <iostream>
 
+#include <glm/ext/matrix_transform.hpp>
+#include "glm/gtc/quaternion.hpp"
 #include "glm/trigonometric.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 namespace loo {
 
 using namespace std;
-void Camera::updateCameraVectors() {
-    glm::vec3 fwd;
-    fwd.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    fwd.y = sin(glm::radians(pitch));
-    fwd.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front = glm::normalize(fwd);
-    right = glm::normalize(glm::cross(front, worldUp));
-    up = glm::normalize(glm::cross(right, front));
-}
 
 glm::mat4 Camera::getViewMatrix() const {
-    return glm::lookAt(position, position + front, up);
-}
-
-glm::mat4 Camera::getProjectionMatrix() const {
-    return glm::perspective(m_fov, m_aspect, m_znear, m_zfar);
+    glm::mat4 view;
+    getViewMatrix(view);
+    return view;
 }
 
 void Camera::getViewMatrix(glm::mat4& view) const {
-    view = glm::lookAt(position, position + front, up);
+    glm::vec3 front = getDirection();
+    view = glm::lookAt(position, position + front, worldUp);
 }
 
-void Camera::getProjectionMatrix(glm::mat4& projection) const {
-    projection = glm::perspective(m_fov, m_aspect, m_znear, m_zfar);
-}
-
-glm::vec3 Camera::getPosition() const {
-    return position;
-}
-
-void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
+void Camera::moveCamera(CameraMovement direction, float deltaTime) {
     float velocity = speed * deltaTime;
+    glm::vec3 front = getDirection();
+    glm::vec3 right = glm::normalize(glm::cross(front, worldUp));
     if (direction == CameraMovement::FORWARD)
         position += front * velocity;
     if (direction == CameraMovement::BACKWARD)
@@ -50,41 +38,58 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
         position += right * velocity;
 }
 
-void Camera::rotateCamera(float xoffset, float yoffset,
-                          GLboolean constrainpitch) {
-    xoffset *= sensitivity;
+void PerspectiveCamera::zoomCamera(float value) {
+    m_fov -= value * 0.05;
+    m_fov = std::clamp(m_fov, 0.01f, float(glm::radians(160.f)));
+}
+
+void PerspectiveCamera::getProjectionMatrix(glm::mat4& projection) const {
+    projection = glm::perspective(m_fov, m_aspect, m_znear, m_zfar);
+}
+
+glm::mat4 PerspectiveCamera::getProjectionMatrix() const {
+    glm::mat4 projection;
+    getProjectionMatrix(projection);
+    return projection;
+}
+
+void FPSCamera::rotateCamera(float xoffset, float yoffset) {
+    xoffset *= -sensitivity;
     yoffset *= sensitivity;
 
-    yaw += xoffset;
-    yaw = yaw > 360.0 ? yaw - 360.0 : yaw;
-    yaw = yaw < -360.0 ? yaw + 360.0 : yaw;
-    pitch += yoffset;
+    m_yaw += xoffset;
+    m_yaw = m_yaw > 360.0 ? m_yaw - 360.0 : m_yaw;
+    m_yaw = m_yaw < -360.0 ? m_yaw + 360.0 : m_yaw;
+    m_pitch += yoffset;
 
-    if (constrainpitch) {
-        if (pitch > 89.0f)
-            pitch = 89.0f;
-        if (pitch < -89.0f)
-            pitch = -89.0f;
-    }
+    if (m_pitch > 89.0f)
+        m_pitch = 89.0f;
+    if (m_pitch < -89.0f)
+        m_pitch = -89.0f;
 
-    updateCameraVectors();
+    // construct quaternion from pitch and yaw
+    orientation =
+        glm::quat(glm::vec3(glm::radians(m_pitch), glm::radians(m_yaw), 0.0f));
 }
 
-void Camera::stareRotate(float xoffset, float yoffset) {
-    glm::vec3 camFocus = position - lookat;
-    glm::mat4 rot =
-        glm::rotate(glm::mat4(1.f), -xoffset * sensitivity * 1e-2f, up) *
-        glm::rotate(glm::mat4(1.f), yoffset * sensitivity * 1e-2f, right);
-    camFocus = glm::vec3(rot * glm::vec4(camFocus, 1.f));
-    position = lookat + camFocus;
-    front = glm::normalize(-camFocus);
-    right = glm::cross(front, worldUp);
-    up = glm::cross(right, front);
-    updatePitchAndYaw();
-}
-void Camera::processMouseScroll(float xoffset, float yoffset) {
-    m_fov -= yoffset * 0.05;
-    m_fov = std::clamp(m_fov, 0.01f, float(glm::radians(160.f)));
+void ArcBallCamera::orbitCamera(float xoffset, float yoffset) {
+    glm::vec3 camFocus = position - m_center;
+    glm::vec3 right = getRight(getDirection());
+    constexpr float THETA_MAX = glm::radians(178.0f),
+                    THETA_MIN = glm::radians(2.0f);
+    glm::vec3 direction = glm::normalize(camFocus);
+    float theta = glm::acos(glm::dot(direction, worldUp));
+    float deltaTheta = yoffset * sensitivity * 1e-2f;
+    // clamp deltaTheta
+    deltaTheta = std::clamp(deltaTheta, THETA_MIN - theta, THETA_MAX - theta);
+
+    // deltaPitch = std::clamp(deltaPitch, PITCH_MIN_RAD - currentPitch,
+    //                         PITCH_MAX_RAD - currentPitch);
+    glm::quat rotPitch = glm::angleAxis(deltaTheta, right);
+    glm::quat rotYaw = glm::angleAxis(-xoffset * sensitivity * 1e-2f, worldUp);
+    camFocus = rotPitch * rotYaw * camFocus;
+    position = m_center + camFocus;
+    orientation = glm::quatLookAt(glm::normalize(-camFocus), worldUp);
 }
 
 }  // namespace loo
