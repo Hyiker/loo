@@ -133,6 +133,7 @@ class LOO_EXPORT ArcBallCamera : public PerspectiveCamera {
                         camera.getZNear(), camera.getZFar(),
                         glm::degrees(camera.getFov()), camera.getAspect()) {}
     void orbitCamera(float xoffset, float yoffset);
+    void orbitCameraAroundWorldUp(float phiInDeg);
     void setCenter(glm::vec3 center) {
         m_center = center;
         orientation =

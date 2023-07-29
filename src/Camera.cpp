@@ -92,4 +92,14 @@ void ArcBallCamera::orbitCamera(float xoffset, float yoffset) {
     orientation = glm::quatLookAt(glm::normalize(-camFocus), worldUp);
 }
 
+void ArcBallCamera::orbitCameraAroundWorldUp(float phiInDeg) {
+    glm::vec3 camFocus = position - m_center;
+    glm::vec3 right = getRight(getDirection());
+    glm::vec3 direction = glm::normalize(camFocus);
+    glm::quat rotYaw = glm::angleAxis(glm::radians(phiInDeg), worldUp);
+    camFocus = rotYaw * camFocus;
+    position = m_center + camFocus;
+    orientation = glm::quatLookAt(glm::normalize(-camFocus), worldUp);
+}
+
 }  // namespace loo

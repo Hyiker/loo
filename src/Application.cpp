@@ -45,12 +45,19 @@ void Application::exit() {
     glfwSetWindowShouldClose(window, true);
 }
 
-float Application::getFrameDeltaTime() const {
-    return deltaTime;
+float Application::getFrameTimeFromStart() const {
+    return frameTime;
 }
 
-float Application::getTime() const {
-    return time;
+float Application::getDeltaTime() const {
+    return frameTime - lastFrameTime;
+}
+void Application::pauseTime() {
+    pauseFlag = true;
+}
+void Application::resumeTime() {
+    pauseFlag = false;
+    glfwSetTime(frameTime);
 }
 
 void Application::run() {
@@ -60,7 +67,8 @@ void Application::run() {
     // uncomment to disable vsync
     glfwSwapInterval(1);
 
-    time = glfwGetTime();
+    frameTime = glfwGetTime();
+    lastFrameTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window) &&
            !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
@@ -68,9 +76,8 @@ void Application::run() {
         // right context
         glfwSetWindowUserPointer(getWindow(), this);
         // compute new time and delta time
-        float t = glfwGetTime();
-        deltaTime = t - time;
-        time = t;
+        if (!pauseFlag)
+            frameTime = glfwGetTime();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -91,6 +98,8 @@ void Application::run() {
 
         // Pool and process events
         glfwPollEvents();
+        if (!pauseFlag)
+            lastFrameTime = frameTime;
     }
     beforeCleanup();
     LOG(INFO) << "Cleaning up" << endl;

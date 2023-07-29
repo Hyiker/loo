@@ -24,7 +24,7 @@ namespace loo {
 /// * provide:
 ///   * getWidth()
 ///   * getHeight()
-///   * getFrameDeltaTime()
+///   * getFrameTimeFromStart()
 ///   * getWindowRatio()
 ///   * windowDimensionChanged()
 /// * let the user define the "loop" function.
@@ -40,9 +40,13 @@ class LOO_EXPORT Application {
     // window control
     void exit();
 
-    // delta time between frame and time from beginning
-    float getFrameDeltaTime() const;
-    float getTime() const;
+    // delta time between frame and time from beginning(in seconds)
+    float getFrameTimeFromStart() const;
+    // delta time from last frame(in seconds)
+    float getDeltaTime() const;
+    // pause time counter
+    void pauseTime();
+    void resumeTime();
 
     // application run
     void run();
@@ -82,8 +86,8 @@ class LOO_EXPORT Application {
     static Quad* globalQuad;
 
     // Time:
-    float time;
-    float deltaTime;
+    float frameTime, lastFrameTime;
+    bool pauseFlag{false};
 
     // Dimensions:
     int width;
