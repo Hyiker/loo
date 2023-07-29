@@ -5,18 +5,21 @@
 #include <vector>
 
 #include "AABB.hpp"
+#include "Bone.hpp"
 #include "Material.hpp"
 #include "Shader.hpp"
 #include "predefs.hpp"
 
 namespace loo {
-
 struct LOO_EXPORT Vertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoord;
     glm::vec3 tangent;
     glm::vec3 bitangent;
+    glm::ivec4 boneIds{-1, -1, -1, -1};
+    glm::vec4 boneWeights{0.0f, 0.0f, 0.0f, 0.0f};
+
     bool operator==(const Vertex& v) const;
     // Re-orthogonalization tangents, modifies tangent and bitangent
     void orthogonalizeTangent();
@@ -49,8 +52,10 @@ struct LOO_EXPORT Mesh {
     size_t countVertex() const;
     size_t countTriangles() const;
 };
-
-LOO_EXPORT std::vector<std::shared_ptr<Mesh>> createMeshFromFile(
+class Animator;
+LOO_EXPORT std::vector<std::shared_ptr<Mesh>> createMeshesFromFile(
+    std::map<std::string, int>& boneIndexMap,
+    std::vector<glm::mat4>& boneOffsetMatrices, Animator* animator,
     const std::string& filename, std::string& modelName);
 
 }  // namespace loo

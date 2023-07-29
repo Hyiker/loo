@@ -75,7 +75,7 @@ void Scene::prepare() const {
     }
 }
 Scene::Scene() {
-    m_modelmat = glm::scale(glm::identity<mat4>(), vec3(0.01));
+    m_modelmat = glm::scale(glm::identity<mat4>(), vec3(1.0));
 }
 Scene createSceneFromFile(const std::string& filename) {
     NOT_IMPLEMENTED_RUNTIME();

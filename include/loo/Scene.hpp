@@ -28,6 +28,8 @@ class LOO_EXPORT Scene {
     auto getMeshes() { return m_meshes; }
     void clear() {
         m_meshes.clear();
+        boneMap.clear();
+        boneMatrices.clear();
         aabb = AABB();
     }
 
@@ -44,6 +46,9 @@ class LOO_EXPORT Scene {
     ~Scene() = default;
     std::string modelName{};
     AABB aabb;
+    // map bone name to its index in the vector
+    std::map<std::string, int> boneMap;
+    std::vector<glm::mat4> boneMatrices;
 };
 
 LOO_EXPORT Scene createSceneFromFile(const std::string& filename);
