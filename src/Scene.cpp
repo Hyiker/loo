@@ -10,6 +10,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <iostream>
 
 namespace std {
@@ -27,15 +28,17 @@ using namespace glm;
 namespace fs = std::filesystem;
 
 void Scene::scale(glm::vec3 ratio) {
-    m_modelmat = glm::scale(m_modelmat, ratio);
+    m_scale = ratio;
 }
 
 void Scene::translate(glm::vec3 pos) {
-    m_modelmat = glm::translate(m_modelmat, pos);
+    m_translate = pos;
 }
 
 glm::mat4 Scene::getModelMatrix() const {
-    return m_modelmat;
+    return glm::translate(glm::identity<glm::mat4>(), m_translate) *
+           glm::toMat4(rotation) *
+           glm::scale(glm::identity<glm::mat4>(), m_scale);
 }
 
 size_t Scene::countMesh() const {
@@ -65,7 +68,7 @@ void Scene::addMeshes(vector<shared_ptr<Mesh>>&& meshes) {
 }
 
 AABB Scene::computeAABBWorldSpace() {
-    return aabb.transform(m_modelmat);
+    return aabb.transform(getModelMatrix());
 }
 
 // prepare the scene, move the mesh data into opengl side
@@ -74,9 +77,7 @@ void Scene::prepare() const {
         mesh->prepare();
     }
 }
-Scene::Scene() {
-    m_modelmat = glm::scale(glm::identity<mat4>(), vec3(1.0));
-}
+Scene::Scene() {}
 Scene createSceneFromFile(const std::string& filename) {
     NOT_IMPLEMENTED_RUNTIME();
     Scene scene;

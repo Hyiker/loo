@@ -222,7 +222,7 @@ void TextureCubeMap::setupStorage(GLsizei width, GLsizei height,
 #endif
     panicPossibleGLError();
 }
-void TextureCubeMap::setupFace(int face, unsigned char* data, GLenum format,
+void TextureCubeMap::setupFace(int face, void* data, GLenum format,
                                GLenum type) {
     CHECK_LT(face, 6);
     CHECK_GE(face, 0);

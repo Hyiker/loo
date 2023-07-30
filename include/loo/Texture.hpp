@@ -22,7 +22,7 @@ inline int mipmapLevelFromSize(int width, int height) {
         height >>= 1;
         lvl++;
     }
-    return lvl;
+    return std::max((int)lvl, 1);
 }
 template <GLenum Target>
 class LOO_EXPORT Texture {
@@ -201,7 +201,7 @@ class LOO_EXPORT TextureCubeMap : public Texture<GL_TEXTURE_CUBE_MAP> {
     void setupStorage(GLsizei width, GLsizei height, GLenum internalformat,
                       int maxLevel = -1);
     // face is indexed [0, 5]
-    void setupFace(int face, unsigned char* data, GLenum format, GLenum type);
+    void setupFace(int face, void* data, GLenum format, GLenum type);
     static const TextureCubeMap& getWhiteTexture();
     static const TextureCubeMap& getBlackTexture();
 };

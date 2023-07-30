@@ -17,7 +17,7 @@
 namespace loo {
 class LOO_EXPORT Scene {
     std::vector<std::shared_ptr<Mesh>> m_meshes;
-    glm::mat4 m_modelmat;
+    glm::vec3 m_scale{1.0f, 1.0f, 1.0f}, m_translate{0.0f, 0.0f, 0.0f};
 
    public:
     void scale(glm::vec3 ratio);
@@ -49,6 +49,7 @@ class LOO_EXPORT Scene {
     // map bone name to its index in the vector
     std::map<std::string, int> boneMap;
     std::vector<glm::mat4> boneMatrices;
+    glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
 };
 
 LOO_EXPORT Scene createSceneFromFile(const std::string& filename);

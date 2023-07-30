@@ -20,7 +20,7 @@ const glm::vec3 CAMERA_ORIENTATION_BASE{0.f, 0.f, -1.f};
 class LOO_EXPORT Camera {
    public:
     // Camera control parameters
-    float speed{0.12f};
+    float speed{10.0f};
 
     Camera() {}
 
