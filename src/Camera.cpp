@@ -101,6 +101,15 @@ void ArcBallCamera::orbitCamera(float xoffset, float yoffset) {
     position = m_center + camFocus;
     orientation = glm::quatLookAt(glm::normalize(-camFocus), worldUp);
 }
+void ArcBallCamera::panCamera(float xoffset, float yoffset) {
+    // keep rotation, move camera position and center
+    glm::vec3 right = getRight(getDirection());
+    glm::vec3 up = glm::normalize(glm::cross(right, getDirection()));
+    glm::vec3 delta = -xoffset * sensitivity * right +
+                      -yoffset * sensitivity * up;  // delta in world space
+    position += delta;
+    m_center += delta;
+}
 
 void ArcBallCamera::orbitCameraAroundWorldUp(float phiInDeg) {
     glm::vec3 camFocus = position - m_center;
