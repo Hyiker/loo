@@ -71,6 +71,10 @@ struct BaseMaterial : public Material {
     std::shared_ptr<loo::Texture2D> specularTex{};
     std::shared_ptr<loo::Texture2D> opacityTex{};
     std::shared_ptr<loo::Texture2D> heightTex{};
+    std::shared_ptr<loo::Texture2D> emissiveTex{};
+
+    // common factors
+    glm::vec3 emissiveFactor;
     // blinn-phong params
     BlinnPhongWorkFlow bpWorkFlow;
     // metalness-roughness params

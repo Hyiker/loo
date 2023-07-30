@@ -136,12 +136,20 @@ std::shared_ptr<BaseMaterial> createBaseMaterialFromAssimp(
         aMaterial, aiTextureType_OPACITY, objParent, TEXTURE_OPTION_MIPMAP);
     material->heightTex = createMaterialTextures(
         aMaterial, aiTextureType_HEIGHT, objParent, TEXTURE_OPTION_MIPMAP);
+    material->emissiveTex = createMaterialTextures(
+        aMaterial, aiTextureType_EMISSIVE, objParent,
+        TEXTURE_OPTION_MIPMAP | TEXTURE_OPTION_CONVERT_TO_LINEAR);
 
     readGLTFMaterial(*material, aMaterial);
 
     int doubleSided = 0;
     aMaterial->Get(AI_MATKEY_TWOSIDED, doubleSided);
     material->flags |= doubleSided ? LOO_MATERIAL_FLAG_DOUBLE_SIDED : 0;
+
+    aiColor3D color3(0, 0, 0);
+    aMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, color3);
+    material->emissiveFactor = aiColor3D2Glm(color3);
+
     return material;
 }
 }  // namespace loo
