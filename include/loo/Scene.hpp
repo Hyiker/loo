@@ -31,6 +31,9 @@ class LOO_EXPORT Scene {
         boneMap.clear();
         boneMatrices.clear();
         aabb = AABB();
+        m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
+        m_translate = glm::vec3(0.0f, 0.0f, 0.0f);
+        rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
     }
 
     // +++++ debug use +++++

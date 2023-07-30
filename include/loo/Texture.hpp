@@ -31,8 +31,8 @@ class LOO_EXPORT Texture {
     GLsizei width{0}, height{0};
 
    public:
-    GLsizei getWidth() { return width; }
-    GLsizei getHeight() { return height; }
+    GLsizei getWidth() const { return width; }
+    GLsizei getHeight() const { return height; }
     void init() {
 #ifdef OGL_46
         glCreateTextures(Target, 1, &m_id);
@@ -117,6 +117,11 @@ class LOO_EXPORT Texture {
         unbind();
 #endif
     }
+    virtual ~Texture() {
+        if (m_id != GL_INVALID_INDEX) {
+            glDeleteTextures(1, &m_id);
+        }
+    }
 };
 constexpr unsigned int TEXTURE_OPTION_MIPMAP = 0x1,
                        TEXTURE_OPTION_CONVERT_TO_LINEAR = 0x2;
@@ -133,6 +138,7 @@ class LOO_EXPORT Texture2D : public Texture<GL_TEXTURE_2D> {
                GLint maxLevel = -1);
     static const Texture2D& getWhiteTexture();
     static const Texture2D& getBlackTexture();
+    void save(const std::string& filename) const;
 };
 
 LOO_EXPORT std::shared_ptr<Texture2D> createTexture2DFromFile(

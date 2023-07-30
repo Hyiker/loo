@@ -4,6 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <glog/logging.h>
 #include <stb_image.h>
+#include <stb_image_write.h>
 
 #include <format>
 
@@ -154,6 +155,16 @@ const Texture2D& Texture2D::getWhiteTexture() {
     }
     return Texture2D::whiteTexture;
 }
+void Texture2D::save(const std::string& filename) const {
+    int width = getWidth(), height = getHeight();
+    std::vector<unsigned char> data(width * height * 3);
+    glGetTextureImage(m_id, 0, GL_RGB, GL_UNSIGNED_BYTE, data.size(),
+                      data.data());
+    stbi_flip_vertically_on_write(true);
+    stbi_write_png(filename.c_str(), width, height, 3, data.data(), width * 3);
+    LOG(INFO) << "Texture saved to " << filename;
+}
+
 const Texture2D& Texture2D::getBlackTexture() {
     if (blackTexture.getId() == GL_INVALID_INDEX) {
         blackTexture.init();
