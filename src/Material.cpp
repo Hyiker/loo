@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include <assimp/GltfMaterial.h>
 #include <assimp/material.h>
 #include <assimp/types.h>
 #include <glm/fwd.hpp>
@@ -99,6 +100,14 @@ static MetallicRoughnessWorkFlow createMetallicRoughnessWorkFlowFromAssimp(
     return workflow;
 }
 
+static void readGLTFMaterial(BaseMaterial& baseMaterial,
+                             const aiMaterial* aMaterial) {
+    aiString alphaMode;
+    aMaterial->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
+    baseMaterial.flags |=
+        !strcmp(alphaMode.C_Str(), "BLEND") ? LOO_MATERIAL_FLAG_ALPHA_BLEND : 0;
+}
+
 std::shared_ptr<BaseMaterial> createBaseMaterialFromAssimp(
     const aiMaterial* aMaterial, fs::path objParent) {
     auto blinnPhong = createBlinnPhongWorkFlowFromAssimp(aMaterial, objParent);
@@ -128,6 +137,11 @@ std::shared_ptr<BaseMaterial> createBaseMaterialFromAssimp(
     material->heightTex = createMaterialTextures(
         aMaterial, aiTextureType_HEIGHT, objParent, TEXTURE_OPTION_MIPMAP);
 
+    readGLTFMaterial(*material, aMaterial);
+
+    int doubleSided = 0;
+    aMaterial->Get(AI_MATKEY_TWOSIDED, doubleSided);
+    material->flags |= doubleSided ? LOO_MATERIAL_FLAG_DOUBLE_SIDED : 0;
     return material;
 }
 }  // namespace loo

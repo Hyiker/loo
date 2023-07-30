@@ -77,8 +77,8 @@ class LOO_EXPORT Application {
     void storeViewport();
     void restoreViewport();
 
-    void beginEvent(const std::string& message) const;
-    void endEvent() const;
+    static void beginEvent(const std::string& message);
+    static void endEvent();
 
    private:
     GLFWwindow* window;

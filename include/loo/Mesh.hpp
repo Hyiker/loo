@@ -43,8 +43,11 @@ struct LOO_EXPORT Mesh {
           objectMatrix(transform),
           aabb(aabb) {}
 
-    bool isTransparent() const {
-        return material ? material->isTransparent() : false;
+    bool needAlphaBlend() const {
+        return material ? material->needAlphaBlend() : false;
+    }
+    bool isDoubleSided() const {
+        return material ? material->isDoubleSided() : false;
     }
 
     GLuint vao, vbo, ebo;

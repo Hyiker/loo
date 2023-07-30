@@ -232,11 +232,11 @@ void Application::restoreViewport() {
     glViewport(m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
 }
 
-void Application::beginEvent(const std::string& message) const {
+void Application::beginEvent(const std::string& message) {
     glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, message.size(),
                      message.c_str());
 }
-void Application::endEvent() const {
+void Application::endEvent() {
     glPopDebugGroup();
 }
 }  // namespace loo

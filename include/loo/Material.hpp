@@ -18,7 +18,8 @@ class LOO_EXPORT Material {
    public:
     // setup uniforms and textures for shader program
     virtual void bind(const ShaderProgram& sp) = 0;
-    [[nodiscard]] virtual bool isTransparent() const { return false; }
+    [[nodiscard]] virtual bool needAlphaBlend() const { return false; }
+    [[nodiscard]] virtual bool isDoubleSided() const { return false; }
 };
 
 struct BlinnPhongWorkFlow {
@@ -54,6 +55,9 @@ struct MetallicRoughnessWorkFlow {
     std::shared_ptr<loo::Texture2D> roughnessTex{};
 };
 
+constexpr unsigned int LOO_MATERIAL_FLAG_ALPHA_BLEND = 0x1,
+                       LOO_MATERIAL_FLAG_DOUBLE_SIDED = 0x2;
+
 struct BaseMaterial : public Material {
 
     void bind(const ShaderProgram& sp) override { NOT_IMPLEMENTED_RUNTIME(); }
@@ -71,6 +75,8 @@ struct BaseMaterial : public Material {
     BlinnPhongWorkFlow bpWorkFlow;
     // metalness-roughness params
     MetallicRoughnessWorkFlow mrWorkFlow;
+
+    unsigned int flags = 0;
 };
 std::shared_ptr<loo::BaseMaterial> createBaseMaterialFromAssimp(
     const aiMaterial* aMaterial, std::filesystem::path objParent);
