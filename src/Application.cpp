@@ -225,11 +225,13 @@ bool Application::keyRight() {
     return glfwGetKey(getWindow(), GLFW_KEY_D) == GLFW_PRESS ||
            glfwGetKey(getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS;
 }
+int Application::viewport[4]{};
+
 void Application::storeViewport() {
-    glGetIntegerv(GL_VIEWPORT, m_viewport);
+    glGetIntegerv(GL_VIEWPORT, viewport);
 }
 void Application::restoreViewport() {
-    glViewport(m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 void Application::beginEvent(const std::string& message) {

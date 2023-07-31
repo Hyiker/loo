@@ -74,8 +74,8 @@ class LOO_EXPORT Application {
     bool windowDimensionChanged();
     void setContext(Application* ctx) { context = ctx; }
 
-    void storeViewport();
-    void restoreViewport();
+    static void storeViewport();
+    static void restoreViewport();
 
     static void beginEvent(const std::string& message);
     static void endEvent();
@@ -93,7 +93,7 @@ class LOO_EXPORT Application {
     int width;
     int height;
     bool dimensionChanged;
-    int m_viewport[4];
+    static int viewport[4];
     void detectWindowDimensionChange();
 
    protected:
