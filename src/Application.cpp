@@ -79,15 +79,17 @@ void Application::run() {
         if (!pauseFlag)
             frameTime = glfwGetTime();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         // detech window related changes
         // detectWindowDimensionChange();
 
         // execute the frame code
         this->loop();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        this->gui();
 
         // Rendering
         ImGui::Render();

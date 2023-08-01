@@ -107,6 +107,7 @@ class LOO_EXPORT Application {
     bool keyRight();
 
     virtual void loop();
+    virtual void gui() {}
     virtual void cleanup();
 
    private:
