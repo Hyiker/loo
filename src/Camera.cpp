@@ -1,12 +1,13 @@
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "loo/Camera.hpp"
 
 #include <algorithm>
-#include <iostream>
-
 #include <glm/ext/matrix_transform.hpp>
+#include <iostream>
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/trigonometric.hpp"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
@@ -43,18 +44,14 @@ void PerspectiveCamera::zoomCamera(float value) {
     m_fov -= value * 0.05;
     m_fov = std::clamp(m_fov, 0.01f, float(glm::radians(160.f)));
 }
-static glm::mat4 perspectiveZInfty(float fovy, float aspect, float zNear) {
-    float f = 1.0f / tan(fovy / 2.0f);
-    return glm::mat4(f / aspect, 0.0f, 0.0f, 0.0f, 0.0f, f, 0.0f, 0.0f, 0.0f,
-                     0.0f, 0.0f, -1.0f, 0.0f, 0.0f, zNear, 0.0f);
-}
 
 void PerspectiveCamera::getProjectionMatrix(glm::mat4& projection,
                                             bool reverseZ01) const {
+    float zNear = m_znear, zFar = m_zfar;
     if (reverseZ01) {
-        projection = perspectiveZInfty(m_fov, m_aspect, m_znear);
-    } else
-        projection = glm::perspective(m_fov, m_aspect, m_znear, m_zfar);
+        std::swap(zNear, zFar);
+    }
+    projection = glm::perspective(m_fov, m_aspect, zNear, zFar);
 }
 
 glm::mat4 PerspectiveCamera::getProjectionMatrix(bool reverseZ01) const {
