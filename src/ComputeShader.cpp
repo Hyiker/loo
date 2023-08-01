@@ -15,5 +15,8 @@ void ComputeShader::dispatch(GLuint numGroupsX, GLuint numGroupsY,
                              GLuint numGroupsZ) const {
     glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
 }
+void ComputeShader::wait(GLbitfield barriers) const {
+    glMemoryBarrier(barriers);
+}
 
 }  // namespace loo
