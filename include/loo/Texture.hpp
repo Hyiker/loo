@@ -1,5 +1,5 @@
-#ifndef LOO_LOO_TEXTURE_HPP
-#define LOO_LOO_TEXTURE_HPP
+#ifndef LOO_INCLUDE_LOO_TEXTURE_HPP
+#define LOO_INCLUDE_LOO_TEXTURE_HPP
 #include <glad/glad.h>
 
 #include <array>
@@ -215,4 +215,4 @@ class LOO_EXPORT TextureCubeMap : public Texture<GL_TEXTURE_CUBE_MAP> {
 LOO_EXPORT std::unique_ptr<TextureCubeMap> createTextureCubeMapFromFiles(
     const std::vector<std::string>& filenames, unsigned int options);
 }  // namespace loo
-#endif /* LOO_LOO_TEXTURE_HPP */
+#endif /* LOO_INCLUDE_LOO_TEXTURE_HPP */

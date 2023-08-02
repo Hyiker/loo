@@ -148,8 +148,8 @@ const Texture2D& Texture2D::getWhiteTexture() {
     if (whiteTexture.getId() == GL_INVALID_INDEX) {
         whiteTexture.init();
         unsigned char whiteData[] = {255, 255, 255};
-        whiteTexture.setup(whiteData, 1, 1, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE,
-                           1);
+        whiteTexture.setup(whiteData, 1, 1, GL_RGBA32F, GL_RGB,
+                           GL_UNSIGNED_BYTE, 1);
         whiteTexture.setSizeFilter(GL_LINEAR, GL_LINEAR);
         whiteTexture.setWrapFilter(GL_REPEAT);
     }
@@ -169,8 +169,8 @@ const Texture2D& Texture2D::getBlackTexture() {
     if (blackTexture.getId() == GL_INVALID_INDEX) {
         blackTexture.init();
         unsigned char blackData[] = {0, 0, 0};
-        blackTexture.setup(blackData, 1, 1, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE,
-                           1);
+        blackTexture.setup(blackData, 1, 1, GL_RGBA32F, GL_RGB,
+                           GL_UNSIGNED_BYTE, 1);
         blackTexture.setSizeFilter(GL_LINEAR, GL_LINEAR);
         blackTexture.setWrapFilter(GL_REPEAT);
     }

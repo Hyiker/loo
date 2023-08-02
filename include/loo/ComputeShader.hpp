@@ -21,6 +21,10 @@ class LOO_EXPORT ComputeShader : public ShaderProgram {
         glBindImageTexture(unit, tex.getId(), level,
                            layered ? GL_TRUE : GL_FALSE, layer, access, format);
     }
+    template <GLenum Target>
+    void setRegularTexture(int unit, const Texture<Target>& tex) const {
+        ShaderProgram::setTexture(unit, tex);
+    }
 
    private:
     // disable the following functions
@@ -35,9 +39,6 @@ class LOO_EXPORT ComputeShader : public ShaderProgram {
                       GLuint offset) {}
     void setTexture(const std::string& name, int index, int texId,
                     GLenum texType = GL_TEXTURE_2D) {}
-    template <GLenum Target>
-    // opengl 4.5+ texture binding interface
-    void setTexture(int unit, const Texture<Target>& tex) const {}
 };
 }  // namespace loo
 #endif /* LOO_INCLUDE_LOO_COMPUTE_SHADER_HPP */
