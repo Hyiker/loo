@@ -245,12 +245,13 @@ vector<shared_ptr<Mesh>> createMeshesFromFile(
     fs::path filePath(filename);
     fs::path fileParent = filePath.parent_path();
     const auto scene = importer.ReadFile(
-        filename, aiProcess_Triangulate | aiProcess_FlipUVs |
-                      aiProcess_GenNormals | aiProcess_GenNormals |
-                      aiProcess_CalcTangentSpace | aiProcess_GenBoundingBoxes |
-                      aiProcess_LimitBoneWeights |
-                      aiProcess_ImproveCacheLocality |
-                      aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph);
+        filename,
+        aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
+            aiProcess_GenNormals | aiProcess_CalcTangentSpace |
+            aiProcess_GenBoundingBoxes | aiProcess_LimitBoneWeights |
+            aiProcess_ImproveCacheLocality | aiProcess_OptimizeMeshes |
+            aiProcess_OptimizeGraph | aiProcess_SplitLargeMeshes |
+            aiProcess_RemoveRedundantMaterials);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
         !scene->mRootNode) {
         LOG(ERROR) << "Assimp: " << importer.GetErrorString() << endl;
