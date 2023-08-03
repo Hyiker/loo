@@ -39,7 +39,6 @@ static AssimpNodeData readHeirarchyData(const aiNode* src) {
 std::unique_ptr<Animation> createAnimationFromAssimp(
     const aiScene& assimpScene, std::map<std::string, int>& boneIndexMap,
     std::vector<glm::mat4>& boneOffsetMatrices) {
-    assert(scene && scene->mRootNode);
     if (!assimpScene.HasAnimations())
         return nullptr;
     auto animation = assimpScene.mAnimations[0];
