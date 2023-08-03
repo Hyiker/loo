@@ -1,5 +1,6 @@
 #include "loo/Texture.hpp"
 
+#include <filesystem>
 #include <vector>
 #define STB_IMAGE_IMPLEMENTATION
 #include <glog/logging.h>
@@ -9,6 +10,10 @@
 #include <format>
 
 #include "loo/glError.hpp"
+#define TINYEXR_USE_STB_ZLIB 1
+#define TINYEXR_USE_THREAD 1
+#define TINYEXR_IMPLEMENTATION
+#include "tinyexr.h"
 namespace loo {
 using namespace std;
 
@@ -92,6 +97,59 @@ std::shared_ptr<Texture2D> createTexture2DFromFile(
     stbi_image_free(data);
     uniqueTexture[filename] = tex;
     LOG(INFO) << "2D Texture " << filename << " loaded.";
+    return tex;
+}
+
+std::shared_ptr<Texture2D> createTexture2DFromHDRFile(
+    const std::string& filename) {
+    filesystem::path p(filename);
+    shared_ptr<Texture2D> tex = make_shared<Texture2D>();
+    int width, height, nchannel;
+    float* data = nullptr;
+    GLenum format = GL_RGB;
+    if (p.extension() == ".exr") {
+        const char* err;
+        if (LoadEXR(&data, &width, &height, filename.c_str(), &err) !=
+            TINYEXR_SUCCESS) {
+            LOG(ERROR) << "Failed to load HDR image " << filename;
+            LOG(ERROR) << err;
+            FreeEXRErrorMessage(err);
+            return nullptr;
+        }
+        // flip y manually
+        for (int i = 0; i < height / 2; i++) {
+            for (int j = 0; j < width; j++) {
+                for (int k = 0; k < 3; k++) {
+                    std::swap(data[(i * width + j) * 4 + k],
+                              data[((height - i - 1) * width + j) * 4 + k]);
+                }
+            }
+        }
+        format = GL_RGBA;
+    } else {
+        stbi_set_flip_vertically_on_load(true);
+        data = stbi_loadf(filename.c_str(), &width, &height, &nchannel, 3);
+        if (data == nullptr) {
+            LOG(ERROR) << "Failed to load HDR image " << filename;
+            LOG(ERROR) << stbi_failure_reason();
+            return nullptr;
+        }
+        CHECK_EQ(nchannel, 3);
+    }
+    tex->init();
+    logPossibleGLError();
+    // attention, mismatch between internalformat and format may casue
+    // GL_INVALID_OPERATION
+    tex->setup(data, width, height, GL_RGB16F, format, GL_FLOAT);
+    panicPossibleGLError();
+    tex->setWrapFilter(GL_CLAMP_TO_EDGE);
+    tex->setSizeFilter(GL_LINEAR, GL_LINEAR);
+    panicPossibleGLError();
+    if (p.extension() == ".exr")
+        free(data);
+    else
+        stbi_image_free(data);
+    LOG(INFO) << "2D HDR Texture " << filename << " loaded.";
     return tex;
 }
 void Texture2D::setupStorage(GLsizei width, GLsizei height,

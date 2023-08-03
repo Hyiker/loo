@@ -145,6 +145,9 @@ LOO_EXPORT std::shared_ptr<Texture2D> createTexture2DFromFile(
     std::unordered_map<std::string, std::shared_ptr<Texture2D>>& uniqueTexture,
     const std::string& filename, unsigned int options);
 
+LOO_EXPORT std::shared_ptr<Texture2D> createTexture2DFromHDRFile(
+    const std::string& filename);
+
 // texture array is a special type of texture
 // it contains multiple texture with only one texture name
 class LOO_EXPORT Texture2DArray : public Texture<GL_TEXTURE_2D_ARRAY> {

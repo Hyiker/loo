@@ -148,7 +148,9 @@ std::shared_ptr<BaseMaterial> createBaseMaterialFromAssimp(
 
     aiColor3D color3(0, 0, 0);
     aMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, color3);
-    material->emissiveFactor = aiColor3D2Glm(color3);
+    float f(1.0);
+    aMaterial->Get(AI_MATKEY_EMISSIVE_INTENSITY, f);
+    material->emissiveFactor = f * aiColor3D2Glm(color3);
 
     return material;
 }
