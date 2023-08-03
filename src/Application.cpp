@@ -100,8 +100,10 @@ void Application::run() {
 
         // Pool and process events
         glfwPollEvents();
-        if (!pauseFlag)
+        if (!pauseFlag) {
             lastFrameTime = frameTime;
+            frameCount++;
+        }
     }
     beforeCleanup();
     LOG(INFO) << "Cleaning up" << endl;

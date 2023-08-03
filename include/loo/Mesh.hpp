@@ -31,6 +31,7 @@ struct LOO_EXPORT Mesh {
     std::shared_ptr<Material> material;
     std::string name;
     glm::mat4 objectMatrix;
+    glm::mat4 objectMatrixPrev;
     AABB aabb;
 
     Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indicies,
@@ -54,6 +55,8 @@ struct LOO_EXPORT Mesh {
     void prepare();
     size_t countVertex() const;
     size_t countTriangles() const;
+    // save current transform matrix to previous transform matrix
+    void savePreviousTransform() { objectMatrixPrev = objectMatrix; }
 };
 class Animator;
 LOO_EXPORT std::vector<std::shared_ptr<Mesh>> createMeshesFromFile(

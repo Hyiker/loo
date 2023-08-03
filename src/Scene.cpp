@@ -40,6 +40,11 @@ glm::mat4 Scene::getModelMatrix() const {
            glm::toMat4(rotation) *
            glm::scale(glm::identity<glm::mat4>(), m_scale);
 }
+glm::mat4 Scene::getPreviousModelMatrix() const {
+    return glm::translate(glm::identity<glm::mat4>(), m_translatePrev) *
+           glm::toMat4(rotationPrev) *
+           glm::scale(glm::identity<glm::mat4>(), m_scalePrev);
+}
 
 size_t Scene::countMesh() const {
     return m_meshes.size();

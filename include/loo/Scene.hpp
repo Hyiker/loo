@@ -17,13 +17,23 @@
 namespace loo {
 class LOO_EXPORT Scene {
     std::vector<std::shared_ptr<Mesh>> m_meshes;
-    glm::vec3 m_scale{1.0f, 1.0f, 1.0f}, m_translate{0.0f, 0.0f, 0.0f};
+    glm::vec3 m_scale{1.0f, 1.0f, 1.0f}, m_translate{0.0f, 0.0f, 0.0f},
+        m_scalePrev{1.0f, 1.0f, 1.0f}, m_translatePrev{0.0f, 0.0f, 0.0f};
 
    public:
     void scale(glm::vec3 ratio);
     void translate(glm::vec3 pos);
     void prepare() const;
     glm::mat4 getModelMatrix() const;
+    glm::mat4 getPreviousModelMatrix() const;
+    void savePreviousTransform() {
+        m_scalePrev = m_scale;
+        m_translatePrev = m_translate;
+        rotationPrev = rotation;
+        for (auto& mesh : m_meshes) {
+            mesh->savePreviousTransform();
+        }
+    }
     auto& getMeshes() const { return m_meshes; }
     auto getMeshes() { return m_meshes; }
     void clear() {
@@ -52,7 +62,8 @@ class LOO_EXPORT Scene {
     // map bone name to its index in the vector
     std::map<std::string, int> boneMap;
     std::vector<glm::mat4> boneMatrices;
-    glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
+    glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f},
+        rotationPrev{1.0f, 0.0f, 0.0f, 0.0f};
 };
 
 LOO_EXPORT Scene createSceneFromFile(const std::string& filename);

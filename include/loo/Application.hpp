@@ -97,8 +97,6 @@ class LOO_EXPORT Application {
     void detectWindowDimensionChange();
 
    protected:
-    std::string title;
-
     void initImGUI();
     // predefined FPS keyset
     bool keyForward();
@@ -109,6 +107,9 @@ class LOO_EXPORT Application {
     virtual void loop();
     virtual void gui() {}
     virtual void cleanup();
+
+    std::string title;
+    unsigned int frameCount{};
 
    private:
     void initGLFW();
