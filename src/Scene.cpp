@@ -9,9 +9,13 @@
 #include "glm/ext/matrix_transform.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
 #include <glm/gtx/hash.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <iostream>
+#include "loo/Animation.hpp"
 
 namespace std {
 size_t hash<loo::Vertex>::operator()(loo::Vertex const& v) const {
@@ -82,10 +86,39 @@ void Scene::prepare() const {
         mesh->prepare();
     }
 }
-Scene::Scene() {}
+Scene::Scene() = default;
+
 Scene createSceneFromFile(const std::string& filename) {
-    NOT_IMPLEMENTED_RUNTIME();
+    using namespace Assimp;
+    Importer importer;
+    const auto aiScene = importer.ReadFile(
+        filename,
+        aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
+            aiProcess_GenNormals | aiProcess_CalcTangentSpace |
+            aiProcess_GenBoundingBoxes | aiProcess_LimitBoneWeights |
+            aiProcess_ImproveCacheLocality | aiProcess_OptimizeMeshes |
+            aiProcess_OptimizeGraph | aiProcess_SplitLargeMeshes |
+            aiProcess_RemoveRedundantMaterials);
+    string modelName = aiScene->mName.C_Str();
+    fs::path modelPath(filename);
+    fs::path modelDir = modelPath.parent_path();
+    if (!aiScene || aiScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
+        !aiScene->mRootNode) {
+        LOG(FATAL) << "Assimp: " << importer.GetErrorString() << endl;
+    }
     Scene scene;
+    auto meshes = createMeshesFromAssimp(aiScene, scene.boneMap,
+                                         scene.boneMatrices, modelDir.string());
+    scene.addMeshes(std::move(meshes));
+    if (scene.modelName.empty()) {
+        scene.modelName = modelPath.stem().string();
+    }
+    scene.prepare();
+
+    if (aiScene->HasAnimations()) {
+        scene.animation = createAnimationFromAssimp(*aiScene, scene.boneMap,
+                                                    scene.boneMatrices);
+    }
 
     return std::move(scene);
 }

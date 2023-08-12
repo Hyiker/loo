@@ -2,6 +2,7 @@
 #include <glog/logging.h>
 #include <glm/gtx/quaternion.hpp>
 #include <utility>
+#include "glm/gtx/compatibility.hpp"
 #include "loo/utils.hpp"
 namespace loo {
 
@@ -63,8 +64,8 @@ glm::mat4 Bone::interpolatePosition(float animationTime) {
         getScaleFactor(m_positions[p0Index].timeStamp,
                        m_positions[p1Index].timeStamp, animationTime);
     glm::vec3 finalPosition =
-        glm::mix(m_positions[p0Index].position, m_positions[p1Index].position,
-                 scaleFactor);
+        glm::lerp(m_positions[p0Index].position, m_positions[p1Index].position,
+                  scaleFactor);
     return glm::translate(glm::mat4(1.0f), finalPosition);
 }
 
@@ -95,8 +96,8 @@ glm::mat4 Bone::interpolateScaling(float animationTime) {
     float scaleFactor =
         getScaleFactor(m_scales[p0Index].timeStamp, m_scales[p1Index].timeStamp,
                        animationTime);
-    glm::vec3 finalScale =
-        glm::mix(m_scales[p0Index].scale, m_scales[p1Index].scale, scaleFactor);
+    glm::vec3 finalScale = glm::lerp(m_scales[p0Index].scale,
+                                     m_scales[p1Index].scale, scaleFactor);
     return glm::scale(glm::mat4(1.0f), finalScale);
 }
 Bone createBoneFromAssimp(const std::string& name, int id,
@@ -129,7 +130,8 @@ Bone createBoneFromAssimp(const std::string& name, int id,
         aiVector3D scale = channel->mScalingKeys[keyIndex].mValue;
         float timeStamp = channel->mScalingKeys[keyIndex].mTime;
         KeyScale data;
-        data.scale = convertVec3AssimpToGLM(scale);
+        // data.scale = convertVec3AssimpToGLM(scale);
+        data.scale = glm::vec3(1.0);
         data.timeStamp = timeStamp;
         scales.push_back(data);
     }

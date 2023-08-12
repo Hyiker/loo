@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 
+#include <assimp/scene.h>
 #include "AABB.hpp"
 #include "Bone.hpp"
 #include "Material.hpp"
@@ -63,6 +64,9 @@ LOO_EXPORT std::vector<std::shared_ptr<Mesh>> createMeshesFromFile(
     std::map<std::string, int>& boneIndexMap,
     std::vector<glm::mat4>& boneOffsetMatrices, Animator* animator,
     const std::string& filename, std::string& modelName);
+LOO_EXPORT std::vector<std::shared_ptr<Mesh>> createMeshesFromAssimp(
+    const aiScene* scene, std::map<std::string, int>& boneIndexMap,
+    std::vector<glm::mat4>& boneOffsetMatrices, const std::string& basePath);
 
 }  // namespace loo
 

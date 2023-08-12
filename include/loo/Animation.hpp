@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include "Bone.hpp"
-#include "Scene.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 namespace loo {
@@ -20,6 +19,8 @@ struct AssimpNodeData {
 class Animation {
    public:
     Animation() = default;
+    Animation(const Animation&) = default;
+    Animation(Animation&&) = default;
 
     Animation(float duration, int ticksPerSecond, std::vector<Bone> bones,
               AssimpNodeData rootNode, std::map<std::string, int> boneIndexMap,
@@ -68,12 +69,12 @@ class Animator {
             m_currentTime += m_currentAnimation->ticksPerSecond * dt;
             m_currentTime = fmod(m_currentTime, m_currentAnimation->duration);
             calculateBoneTransform(&m_currentAnimation->rootNode,
-                                   glm::mat4(1.0f));
+                                   glm::identity<glm::mat4>());
         }
     }
 
-    void resetAnimation(std::unique_ptr<Animation> animation) {
-        m_currentAnimation = std::move(animation);
+    void resetAnimation(std::shared_ptr<Animation> animation) {
+        m_currentAnimation = animation;
         m_currentTime = 0.0f;
     }
 
@@ -96,12 +97,11 @@ class Animator {
             int index = boneInfoMap[nodeName];
             glm::mat4 offset = m_currentAnimation->boneMatrices[index];
             finalBoneMatrices[index] = globalTransformation * offset;
-            // std::cout << index << ": "
-            //           << glm::to_string(finalBoneMatrices[index]) << std::endl;
         }
 
-        for (int i = 0; i < node->childrenCount; i++)
+        for (int i = 0; i < node->childrenCount; i++) {
             calculateBoneTransform(&node->children[i], globalTransformation);
+        }
     }
 
     bool hasAnimation() { return m_currentAnimation != nullptr; }
@@ -110,11 +110,11 @@ class Animator {
     std::vector<glm::mat4> boneMatrices;
 
    private:
-    std::unique_ptr<Animation> m_currentAnimation;
+    std::shared_ptr<Animation> m_currentAnimation;
     float m_currentTime;
 };
 
-std::unique_ptr<Animation> createAnimationFromAssimp(
+std::shared_ptr<Animation> createAnimationFromAssimp(
     const aiScene& assimpScene, std::map<std::string, int>& boneIndexMap,
     std::vector<glm::mat4>& boneOffsetMatrices);
 }  // namespace loo

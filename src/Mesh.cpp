@@ -96,7 +96,7 @@ static void extractAssimpMeshBones(const aiMesh* mesh,
         LOG(INFO) << "mesh has bones: " << mesh->mNumBones;
     }
     for (unsigned int i = 0; i < mesh->mNumBones; i++) {
-        int boneIndex = 0;
+        int boneIndex;
         string boneName(mesh->mBones[i]->mName.C_Str());
         if (boneName.empty()) {
             LOG(WARNING) << "bone name is empty";
@@ -111,17 +111,18 @@ static void extractAssimpMeshBones(const aiMesh* mesh,
         } else {
             boneIndex = boneIndexMap[boneName];
         }
-        for (unsigned int j = 0; j < std::min((int)mesh->mBones[i]->mNumWeights,
-                                              BONES_MAX_INFLUENCE);
-             j++) {
-            int vertexID = mesh->mBones[i]->mWeights[j].mVertexId;
-            float weight = mesh->mBones[i]->mWeights[j].mWeight;
-            CHECK_LT(vertexID, vertices.size());
+        auto weights = mesh->mBones[i]->mWeights;
+        for (unsigned int j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
+            int vertexID = weights[j].mVertexId;
             Vertex& vertex = vertices[vertexID];
-            vertex.boneIds[j] = boneIndex;
-            vertex.boneWeights[j] = weight;
-            // LOG(INFO) << j << " bone " << boneName << " " << boneIndex << " "
-            //           << vertexID << " " << weight;
+            float weight = weights[j].mWeight;
+            for (int k = 0; k < BONES_MAX_INFLUENCE; k++) {
+                if (vertex.boneIds[k] < 0) {
+                    vertex.boneIds[k] = boneIndex;
+                    vertex.boneWeights[k] = weight;
+                    break;
+                }
+            }
         }
     }
 }
@@ -265,6 +266,14 @@ vector<shared_ptr<Mesh>> createMeshesFromFile(
                                                            boneOffsetMatrices));
     }
     modelName = scene->mName.C_Str();
+    return std::move(meshes);
+}
+std::vector<std::shared_ptr<Mesh>> createMeshesFromAssimp(
+    const aiScene* scene, std::map<std::string, int>& boneIndexMap,
+    std::vector<glm::mat4>& boneOffsetMatrices, const std::string& basePath) {
+    vector<shared_ptr<Mesh>> meshes;
+    processAssimpNode(scene->mRootNode, scene, meshes, boneIndexMap,
+                      boneOffsetMatrices, basePath, glm::identity<glm::mat4>());
     return std::move(meshes);
 }
 

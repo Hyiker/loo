@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "AABB.hpp"
+#include "Animation.hpp"
 #include "Mesh.hpp"
 #include "predefs.hpp"
 
@@ -64,6 +65,7 @@ class LOO_EXPORT Scene {
     std::vector<glm::mat4> boneMatrices;
     glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f},
         rotationPrev{1.0f, 0.0f, 0.0f, 0.0f};
+    std::shared_ptr<Animation> animation{};
 };
 
 LOO_EXPORT Scene createSceneFromFile(const std::string& filename);

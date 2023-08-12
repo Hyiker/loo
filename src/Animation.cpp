@@ -36,7 +36,7 @@ static AssimpNodeData readHeirarchyData(const aiNode* src) {
     return dest;
 }
 
-std::unique_ptr<Animation> createAnimationFromAssimp(
+std::shared_ptr<Animation> createAnimationFromAssimp(
     const aiScene& assimpScene, std::map<std::string, int>& boneIndexMap,
     std::vector<glm::mat4>& boneOffsetMatrices) {
     if (!assimpScene.HasAnimations())
@@ -47,7 +47,7 @@ std::unique_ptr<Animation> createAnimationFromAssimp(
     std::vector<Bone> bones;
     auto rootNode = readHeirarchyData(assimpScene.mRootNode);
     readMissingBones(animation, bones, boneIndexMap, boneOffsetMatrices);
-    return std::make_unique<Animation>(duration, ticksPerSecond, bones,
+    return std::make_shared<Animation>(duration, ticksPerSecond, bones,
                                        rootNode, boneIndexMap,
                                        boneOffsetMatrices);
 }
